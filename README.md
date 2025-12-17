@@ -117,6 +117,6 @@ Made with ❤️ for Christmas celebrations!
 
 ## 🌐 Live Demo
 
-**🎄 Experience the magic here:** [https://trtrantnt.github.io/christmas-magic/](https://trtrantnt.github.io/christmas-magic/)
+**🎄 Experience the magic here:** [https://trtrantnt.github.io/magic-christmas-tree/](https://trtrantnt.github.io/magic-christmas-tree/)
 
 *Note: Requires a device with a working webcam and modern browser (Chrome, Edge, Firefox recommended)*
