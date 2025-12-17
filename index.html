@@ -70,7 +70,8 @@
             transform: scaleX(-1); 
             opacity: 0.6; 
             border-radius: 8px;
-            object-fit: cover;
+            object-fit: contain;
+            background: black;
         }
 
         #error-log { 
@@ -370,8 +371,8 @@
             hands.setOptions({ 
                 maxNumHands: 2, 
                 modelComplexity: isMobile ? 0 : 1,
-                minDetectionConfidence: isMobile ? 0.3 : 0.5,
-                minTrackingConfidence: isMobile ? 0.3 : 0.5
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
             });
             hands.onResults(results => {
                 ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -380,7 +381,8 @@
                     const h1 = results.multiHandLandmarks[0]; const h2 = results.multiHandLandmarks[1];
                     const distIndex = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
                     const distThumb = Math.hypot(h1[4].x - h2[4].x, h1[4].y - h2[4].y);
-                    if (distIndex < 0.15 && distThumb < 0.15) { state = 'HEART'; return; }
+                    const threshold = isMobile ? 0.2 : 0.15;
+                    if (distIndex < threshold && distThumb < threshold) { state = 'HEART'; return; }
                 }
                 if(results.multiHandLandmarks.length > 0) {
                     const lm = results.multiHandLandmarks[0]; handX = lm[9].x; 
