@@ -70,6 +70,7 @@
             transform: scaleX(-1); 
             opacity: 0.6; 
             border-radius: 8px;
+            object-fit: cover;
         }
 
         #error-log { 
@@ -148,10 +149,16 @@
             gift: createCustomTexture('gift_red')
         };
 
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         const CONFIG = {
-            goldCount: 2000, redCount: 300, giftCount: 150,
-            explodeRadius: 65, photoOrbitRadius: 25,
-            treeHeight: 70, treeBaseRadius: 35
+            goldCount: isMobile ? 800 : 2000,
+            redCount: isMobile ? 120 : 300,
+            giftCount: isMobile ? 60 : 150,
+            explodeRadius: 65,
+            photoOrbitRadius: 25,
+            treeHeight: 70,
+            treeBaseRadius: 35
         };
 
         let scene, camera, renderer;
@@ -360,9 +367,15 @@
             const canvas = document.getElementById('camera-preview');
             const ctx = canvas.getContext('2d');
             const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
-            hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            hands.setOptions({ 
+                maxNumHands: 2, 
+                modelComplexity: isMobile ? 0 : 1,
+                minDetectionConfidence: isMobile ? 0.3 : 0.5,
+                minTrackingConfidence: isMobile ? 0.3 : 0.5
+            });
             hands.onResults(results => {
-                ctx.clearRect(0,0,100,75); ctx.drawImage(results.image, 0, 0, 100, 75);
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
                 if (results.multiHandLandmarks.length === 2) {
                     const h1 = results.multiHandLandmarks[0]; const h2 = results.multiHandLandmarks[1];
                     const distIndex = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
@@ -379,7 +392,19 @@
                     else state = 'EXPLODE'; 
                 } else state = 'TREE'; 
             });
-            const cameraUtils = new Camera(video, { onFrame: async () => { await hands.send({image: video}); }, width: 320, height: 240 });
+            let frameCount = 0;
+            const skipFrames = isMobile ? 2 : 1;
+            
+            const cameraUtils = new Camera(video, { 
+                onFrame: async () => { 
+                    frameCount++;
+                    if (frameCount % skipFrames === 0) {
+                        await hands.send({image: video}); 
+                    }
+                }, 
+                width: isMobile ? 240 : 320,
+                height: isMobile ? 180 : 240
+            });
             cameraUtils.start();
         }
 
