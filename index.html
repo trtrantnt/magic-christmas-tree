@@ -272,9 +272,19 @@
             for(let i=0; i<5; i++){ sCtx.lineTo(cx + Math.cos((18+i*72)/180*Math.PI)*outer, cy - Math.sin((18+i*72)/180*Math.PI)*outer); sCtx.lineTo(cx + Math.cos((54+i*72)/180*Math.PI)*inner, cy - Math.sin((54+i*72)/180*Math.PI)*inner); }
             sCtx.closePath(); sCtx.fill();
             const starTex = new THREE.CanvasTexture(starCanvas);
-            const starMat = new THREE.MeshBasicMaterial({ map: starTex, transparent: true, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
-            starMesh = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), starMat);
-            starMesh.position.set(0, CONFIG.treeHeight/2 + 2, 0); scene.add(starMesh);
+            
+            // Create star with double-sided geometry (2 planes back-to-back)
+            const starGeo = new THREE.PlaneGeometry(12, 12);
+            const starMat = new THREE.MeshBasicMaterial({ map: starTex, transparent: true, blending: THREE.AdditiveBlending });
+            starMesh = new THREE.Mesh(starGeo, starMat);
+            
+            // Add back face
+            const starBack = new THREE.Mesh(starGeo, starMat);
+            starBack.rotation.y = Math.PI; // Flip 180 degrees
+            starMesh.add(starBack);
+            
+            starMesh.position.set(0, CONFIG.treeHeight/2 + 2, 0);
+            scene.add(starMesh);
 
             const loveCanvas = document.createElement('canvas');
             loveCanvas.width = 1024; loveCanvas.height = 256;
@@ -335,15 +345,8 @@
                 titleMesh.visible = true; starMesh.visible = true; loveMesh.visible = false;
                 titleMesh.scale.lerp(new THREE.Vector3(1,1,1), 0.1);
                 
-                // Rotate star position around Y axis
-                const starY = CONFIG.treeHeight/2 + 2;
-                const starRadius = 0.5;
-                const angle = groupGold.rotation.y;
-                starMesh.position.x = Math.sin(angle) * starRadius;
-                starMesh.position.y = starY;
-                starMesh.position.z = Math.cos(angle) * starRadius;
-                starMesh.lookAt(camera.position);
-                starMesh.rotation.z += 0.01;
+                // Star rotates with tree
+                starMesh.rotation.y = groupGold.rotation.y;
                 
                 starMesh.material.opacity = 0.7 + 0.3 * Math.sin(time*5);
                 photoMeshes.forEach(m => { m.scale.lerp(new THREE.Vector3(0,0,0), 0.1); m.visible = false; });
