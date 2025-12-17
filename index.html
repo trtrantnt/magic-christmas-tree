@@ -334,8 +334,8 @@
             if (state === 'TREE') {
                 titleMesh.visible = true; starMesh.visible = true; loveMesh.visible = false;
                 titleMesh.scale.lerp(new THREE.Vector3(1,1,1), 0.1);
-                starMesh.rotation.y = groupGold.rotation.y; 
                 starMesh.lookAt(camera.position);
+                starMesh.rotation.z += 0.01;
                 starMesh.material.opacity = 0.7 + 0.3 * Math.sin(time*5);
                 photoMeshes.forEach(m => { m.scale.lerp(new THREE.Vector3(0,0,0), 0.1); m.visible = false; });
             } else if (state === 'HEART') {
