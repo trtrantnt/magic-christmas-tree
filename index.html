@@ -334,8 +334,17 @@
             if (state === 'TREE') {
                 titleMesh.visible = true; starMesh.visible = true; loveMesh.visible = false;
                 titleMesh.scale.lerp(new THREE.Vector3(1,1,1), 0.1);
+                
+                // Rotate star position around Y axis
+                const starY = CONFIG.treeHeight/2 + 2;
+                const starRadius = 0.5;
+                const angle = groupGold.rotation.y;
+                starMesh.position.x = Math.sin(angle) * starRadius;
+                starMesh.position.y = starY;
+                starMesh.position.z = Math.cos(angle) * starRadius;
                 starMesh.lookAt(camera.position);
                 starMesh.rotation.z += 0.01;
+                
                 starMesh.material.opacity = 0.7 + 0.3 * Math.sin(time*5);
                 photoMeshes.forEach(m => { m.scale.lerp(new THREE.Vector3(0,0,0), 0.1); m.visible = false; });
             } else if (state === 'HEART') {
